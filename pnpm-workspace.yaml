@@ -1,0 +1,7 @@
+# Workspace globs mirror the Architecture Blueprint (Section 5) top-level folders exactly.
+# No application code is created by this scaffold — these globs simply define where
+# future packages will be picked up by pnpm once modules are added (M1+).
+packages:
+  - "apps/*"
+  - "services/*"
+  - "packages/*"
