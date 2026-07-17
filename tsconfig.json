@@ -9,6 +9,7 @@
     { "path": "packages/event-contracts" },
     { "path": "packages/api-client-sdk" },
     { "path": "packages/ui-components" },
-    { "path": "packages/permissions-schema" }
+    { "path": "packages/permissions-schema" },
+    { "path": "services/core-api" }
   ]
 }

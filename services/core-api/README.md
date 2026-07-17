@@ -24,4 +24,13 @@ without breaking the compile of unrelated modules (aside from `shared-kernel/` a
 | `src/bootstrap/`     | DI container, app wiring, config loading           |
 | `test/e2e/`          | End-to-end tests spanning multiple modules         |
 
-No application code exists yet.
+**Status:** Bootstrap-only. Fastify + Mercurius (GraphQL) + REST wired in
+`src/bootstrap/`; entry point at `src/main.ts`. No authentication, no database logic,
+no business modules registered — `src/modules/*` and `src/platform/*` remain exactly
+as scaffolded, untouched by this milestone.
+
+**Framework note:** neither the Architecture Blueprint nor the TDD mandate a specific
+HTTP framework or GraphQL server library (TDD §4.1 only pins "TypeScript (Node.js)").
+Fastify + Mercurius were chosen for this milestone per explicit instruction — this
+supersedes the NestJS + Apollo choice recorded in the Implementation Roadmap, which was
+this project's own judgment call, not a source-doc requirement.
