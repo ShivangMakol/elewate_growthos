@@ -1,0 +1,14 @@
+// Solution-style root tsconfig. This file builds nothing itself ("files": [])
+// — it only declares the TypeScript project-reference graph so `tsc --build`
+// (or an IDE) can resolve and order builds across all composite packages.
+// packages/config is intentionally excluded: it's plain JS tooling config,
+// not a compiled TypeScript project, so it has no tsconfig.json of its own.
+{
+  "files": [],
+  "references": [
+    { "path": "packages/event-contracts" },
+    { "path": "packages/api-client-sdk" },
+    { "path": "packages/ui-components" },
+    { "path": "packages/permissions-schema" }
+  ]
+}

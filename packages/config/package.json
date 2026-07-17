@@ -1,0 +1,23 @@
+{
+  "name": "@elewate/config",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Centralized ESLint, Prettier, and TypeScript config shared across all apps/services/packages (TDD Section 4.2).",
+  "license": "UNLICENSED",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./eslint.base.mjs": "./eslint.base.mjs",
+    "./prettier.base.js": "./prettier.base.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "eslint.base.mjs",
+    "prettier.base.js",
+    "index.js"
+  ],
+  "peerDependencies": {
+    "eslint": "^9.17.0",
+    "typescript": "^5.7.2"
+  }
+}
