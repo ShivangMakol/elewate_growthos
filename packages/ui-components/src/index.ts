@@ -2,18 +2,27 @@
  * @elewate/ui-components
  *
  * Design system (white-label themeable) — Architecture Blueprint §5.
- * Purely-presentational components (Button, Input, Table, Drawer) consuming
- * CSS variables/theme tokens rather than hardcoded colors (TDD §7), plus the
- * shared KanbanBoard component reused across Leads, Pipeline, and Recruitment
- * (TDD §7).
+ * Shared across apps/web, apps/admin, apps/portal so "Shared Theme" is a real
+ * single source of truth rather than three independent implementations.
  *
- * No components are defined yet — this package is configured (package.json,
- * tsconfig, workspace/peer dependencies) but intentionally contains no
- * component implementations. Base primitives are introduced in M0; the shared
- * KanbanBoard is introduced in M3 — see the Task List.
- *
- * This file exists only to give the package a valid, buildable TypeScript
- * entry point ahead of that content landing.
+ * Scope note: only the primitives needed for the app-shell milestone exist so
+ * far (Button, Card, ThemeProvider, ThemeToggle, cn utility, shared theme.css).
+ * The full shadcn/ui-style component library and the shared KanbanBoard
+ * component are introduced in later milestones per the Task List (M0 base
+ * primitives, M3 KanbanBoard).
  */
+
+export { Button, buttonVariants, type ButtonProps } from "./components/button";
+export {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "./components/card";
+export { ThemeProvider } from "./components/theme-provider";
+export { ThemeToggle } from "./components/theme-toggle";
+export { cn } from "./lib/utils";
 
 export const UI_COMPONENTS_PACKAGE_VERSION = "0.0.0";

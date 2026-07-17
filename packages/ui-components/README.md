@@ -8,6 +8,8 @@ Shared React component library consumed by `apps/web`, `apps/admin`, and `apps/p
 hardcoded values — this is what lets the Partner → Partner's Clients white-label tier
 (Task List M13) reskin the product without a fork.
 
-No application code exists yet — base primitives (Button, Input, Drawer, Table shell)
-are introduced in M0; the shared Kanban component (reused across Leads, Pipeline,
-Recruitment) is introduced in M3.
+Built so far (app-shell milestone): `Button`, `Card` (+ subcomponents), `ThemeProvider`,
+`ThemeToggle`, the `cn()` utility, and the shared `theme.css` design tokens consumed via
+`@elewate/ui-components/theme.css`. The full shadcn/ui-style library and the shared
+KanbanBoard component are introduced in later milestones per the Task List (M3
+KanbanBoard).

@@ -1,0 +1,9 @@
+@import "@elewate/ui-components/theme.css";
+
+/*
+ * Tailwind v4 auto-detects content in this app's own directory, but
+ * @elewate/ui-components lives outside it (a sibling workspace package), so
+ * its source must be explicitly added or its Tailwind classes (in Button,
+ * Card, etc.) would never be generated in this app's compiled CSS.
+ */
+@source "../../../packages/ui-components/src";

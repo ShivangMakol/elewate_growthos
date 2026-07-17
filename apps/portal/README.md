@@ -8,4 +8,6 @@ from `apps/web`, which is for internal team members only. Kept as a separate app
 rather than a route inside `apps/web` so that external-user auth and internal-user
 auth never share a session boundary.
 
-No application code yet — introduced in M8 per the Task List.
+**Status:** App shell built — same stack as `apps/web`/`apps/admin`. Only page is the
+placeholder dashboard — no business logic. The real Client Portal module lands at M8
+per the Task List.
