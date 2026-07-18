@@ -2,6 +2,7 @@ import Fastify, { type FastifyInstance } from "fastify";
 import mercurius from "mercurius";
 
 import { schema, resolvers } from "./graphql-schema.js";
+import { checkDatabaseConnection } from "./postgres-client.js";
 
 /**
  * Composition root — Architecture Blueprint §5 ("bootstrap/ — DI container,
@@ -26,7 +27,13 @@ export function createServer(): FastifyInstance {
   // REST surface (Architecture §6.1) — health check only at this stage.
   // Real per-module REST controllers live in each module's own
   // interface/rest/ folder (TDD §5) once modules exist.
-  app.get("/health", async () => ({ status: "ok", service: "core-api" }));
+  app.get("/health", async (_request, reply) => {
+    const db = await checkDatabaseConnection();
+    if (!db.connected) {
+      return reply.code(503).send({ status: "degraded", service: "core-api", database: db });
+    }
+    return { status: "ok", service: "core-api", database: db };
+  });
 
   // GraphQL surface (Architecture §6.1, TDD §3.2).
   app.register(mercurius, {

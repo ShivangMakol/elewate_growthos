@@ -2,7 +2,7 @@
   "name": "@elewate/core-api",
   "version": "0.0.0",
   "private": true,
-  "description": "The modular monolith — Architecture Blueprint §5. Currently bootstrap-only: no authentication, no database logic, no business modules registered.",
+  "description": "The modular monolith — Architecture Blueprint §5. Bootstrap-only: no authentication, no business modules registered. Database connection/migrations/seeding are configured (Prisma) but no tables (business or platform) are defined yet.",
   "license": "UNLICENSED",
   "type": "module",
   "main": "dist/main.js",
@@ -15,16 +15,28 @@
     "start": "node dist/main.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "db:generate": "prisma generate",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio",
+    "db:reset": "prisma migrate reset"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "7.8.0",
+    "@prisma/client": "^7.8.0",
+    "dotenv": "17.4.2",
     "fastify": "^5.10.0",
     "graphql": "^16.14.2",
-    "mercurius": "^16.10.0"
+    "mercurius": "^16.10.0",
+    "pg": "8.22.0"
   },
   "devDependencies": {
     "@elewate/config": "workspace:*",
     "@types/node": "^22.20.1",
+    "@types/pg": "8.20.0",
+    "prisma": "^7.8.0",
     "tsx": "^4.23.1",
     "typescript": "^5.7.2"
   }

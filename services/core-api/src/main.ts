@@ -1,4 +1,4 @@
-import { createServer } from "./bootstrap/index.js";
+import { createServer, closeDatabasePool } from "./bootstrap/index.js";
 
 const PORT = Number(process.env.PORT ?? 4000);
 const HOST = process.env.HOST ?? "0.0.0.0";
@@ -9,6 +9,7 @@ async function main(): Promise<void> {
   const shutdown = async (signal: string): Promise<void> => {
     app.log.info(`Received ${signal}, shutting down.`);
     await app.close();
+    await closeDatabasePool();
     process.exit(0);
   };
   process.on("SIGTERM", () => void shutdown("SIGTERM"));

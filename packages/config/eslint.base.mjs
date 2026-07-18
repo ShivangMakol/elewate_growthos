@@ -91,7 +91,9 @@ export const baseConfig = [
     // filenames (page/layout/loading/error/not-found/template/route
     // handlers) and for next.config.ts — this is a framework convention,
     // not a style choice, so it's exempted from the TDD 4.2 named-exports
-    // rule rather than weakening that rule repo-wide.
+    // rule rather than weakening that rule repo-wide. prisma.config.ts is
+    // the same situation: Prisma's CLI specifically requires
+    // `export default defineConfig(...)`.
     files: [
       "apps/*/app/**/page.tsx",
       "apps/*/app/**/layout.tsx",
@@ -102,6 +104,7 @@ export const baseConfig = [
       "apps/*/app/**/route.ts",
       "apps/*/next.config.ts",
       "apps/*/middleware.ts",
+      "services/*/prisma.config.ts",
     ],
     rules: {
       "import/no-default-export": "off",

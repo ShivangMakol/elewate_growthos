@@ -1,0 +1,21 @@
+// Elewate GrowthOS — Prisma schema
+//
+// Deliberately empty of models. This milestone configures the database
+// connection, migration mechanism, and seeding mechanism only — per
+// explicit instruction, no business tables (CRM, Leads, Pipeline, ...) and
+// no platform tables (iam, tenancy, audit, ...) are defined here. Those
+// land at their respective milestones per the Task List, not invented
+// ahead of schedule.
+//
+// Connection URL lives in ../services/core-api/prisma.config.ts, not here —
+// Prisma 7 moved datasource.url out of schema.prisma (see that file's
+// comments for why).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../services/core-api/src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
