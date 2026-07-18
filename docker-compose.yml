@@ -1,0 +1,158 @@
+name: elewate-growthos
+
+# Local development environment only. Not used for staging/production
+# (those are provisioned via infra/terraform + infra/ecs, per Architecture
+# Blueprint §5) — this file exists purely so `core-api` has something to
+# talk to on a developer's machine.
+#
+# Verification note: this was authored in a sandboxed environment where the
+# Docker daemon itself runs fine, but the egress proxy blocks
+# registry-1.docker.io (confirmed directly: `docker pull` returns 403
+# Forbidden), so none of these images could actually be pulled to verify a
+# real end-to-end boot there. Validated instead via `docker compose config`
+# (real schema/interpolation validation) and manual review against each
+# image's documented Compose usage. Run `pnpm run docker:up` on a machine
+# with normal internet access to do the real first boot.
+#
+# Two things flagged here rather than used silently:
+#
+# 1. REDIS: Redis 8 is AGPLv3-licensed (Redis Ltd added AGPL as one of three
+#    license options in 2025, after the 2024 SSPL/RSAL change). AGPL's
+#    copyleft terms are a real concern for a commercial SaaS if this image
+#    is ever used past local dev. Valkey (BSD-3-Clause, Linux Foundation,
+#    wire-compatible drop-in) is the more common industry default for new
+#    self-hosted projects in 2026. Kept as literal Redis here per explicit
+#    instruction — revisit before using this compose file as a template for
+#    any shared/staging environment.
+#
+# 2. MINIO: the official `minio/minio` image is EOL — MinIO Inc. archived
+#    the repository (Feb/Apr 2026) and stopped shipping security fixes to
+#    the community edition, redirecting users to their paid "AIStor"
+#    product. Using `pgsty/minio`, a community-maintained fork that still
+#    receives updates, instead of the dead official image. This is still
+#    "MinIO" (same S3-compatible API) — just not the abandoned upstream
+#    image. Worth re-evaluating (e.g. Garage, SeaweedFS) if this setup
+#    outlives local dev.
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-elewate_growthos}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-elewate_growthos}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  minio:
+    image: pgsty/minio:latest
+    restart: unless-stopped
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  # One-shot init container: creates the default dev bucket so core-api
+  # doesn't need any first-run bucket-creation logic of its own (which
+  # would be "database/storage logic" outside this milestone's scope).
+  minio-init:
+    image: pgsty/minio:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >
+        mc alias set local http://minio:9000 ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin} &&
+        mc mb --ignore-existing local/${FILE_STORAGE_S3_BUCKET:-elewate-growthos-dev}
+    restart: "no"
+
+  mailpit:
+    image: axllent/mailpit:v1.30.2
+    restart: unless-stopped
+    ports:
+      - "${MAILPIT_SMTP_PORT:-1025}:1025"
+      - "${MAILPIT_UI_PORT:-8025}:8025"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8025/livez"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  core-api:
+    build:
+      context: .
+      dockerfile: services/core-api/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    ports:
+      - "${CORE_API_PORT:-4000}:4000"
+    environment:
+      NODE_ENV: development
+      PORT: 4000
+      HOST: 0.0.0.0
+      # In-network service names, not localhost — this container talks to
+      # its sibling containers over the compose network, unlike core-api
+      # run directly on the host (which uses .env's localhost URLs).
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-elewate_growthos}
+      REDIS_URL: redis://redis:6379
+      FILE_STORAGE_S3_ENDPOINT: http://minio:9000
+      FILE_STORAGE_S3_BUCKET: ${FILE_STORAGE_S3_BUCKET:-elewate-growthos-dev}
+      FILE_STORAGE_S3_REGION: ${FILE_STORAGE_S3_REGION:-us-east-1}
+      FILE_STORAGE_S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-minioadmin}
+      FILE_STORAGE_S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      NOTIFICATIONS_SMTP_HOST: mailpit
+      NOTIFICATIONS_SMTP_PORT: 1025
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:

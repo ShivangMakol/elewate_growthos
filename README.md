@@ -6,9 +6,12 @@ Automation, and Team Management under one platform.
 
 ## Status
 
-**Pre-implementation.** This repository currently contains only the planning
-documents and the monorepo tooling scaffold (Milestone M0, tooling phase). No
-application code, services, or packages exist yet.
+**Bootstrap in progress (Milestone M0).** The monorepo tooling, full architecture
+folder structure, shared packages, all three app shells (`apps/web`, `apps/admin`,
+`apps/portal`), the `core-api` bootstrap server, and a local Docker Compose
+development environment all exist. No business modules (CRM, Leads, Pipeline, etc.),
+no authentication, and no database logic are wired in yet — see the Task List for
+what's real vs. scaffolded.
 
 ## Planning Documents
 
@@ -23,34 +26,37 @@ The entire system is specified before any code is written. Read in this order:
 
 ## Monorepo Structure
 
-Per the Architecture Blueprint (Section 5) and TDD (Section 5). Folders below marked
-_(not yet created)_ will be added in the milestone that introduces them — see the Task
-List for the exact schedule.
+Per the Architecture Blueprint (Section 5) and TDD (Section 5).
 
 ```
 elewate-growthos/
-├── apps/                    (not yet created — M1+)
-│   ├── web/                 # Next.js tenant-facing app
-│   ├── admin/               # Internal super-admin console
-│   ├── mobile/               # React Native app
-│   └── portal/               # Client Portal SPA
+├── apps/
+│   ├── web/                  # ✅ Next.js shell — placeholder dashboard only
+│   ├── admin/                 # ✅ Next.js shell — placeholder dashboard only
+│   ├── mobile/                (not yet created)
+│   └── portal/                 # ✅ Next.js shell — placeholder dashboard only
 ├── services/
-│   └── core-api/            (not yet created — M1+)
+│   └── core-api/               # ✅ Fastify + Mercurius bootstrap only —
+│                                #    no auth, no DB logic, no business modules
 ├── packages/
-│   ├── config/               # ✅ centralized ESLint/Prettier config (this milestone)
-│   ├── ui-components/        (not yet created — M1+)
-│   ├── api-client-sdk/       (not yet created)
-│   ├── event-contracts/      (not yet created)
-│   └── permissions-schema/   (not yet created)
-├── infra/                    (not yet created — Terraform, ECS/K8s, CI/CD)
+│   ├── config/                 # ✅ centralized ESLint/Prettier config
+│   ├── ui-components/           # ✅ shared theme + Button/Card/ThemeToggle
+│   ├── api-client-sdk/           # ✅ configured, placeholder entry point
+│   ├── event-contracts/          # ✅ configured, placeholder entry point
+│   └── permissions-schema/       # ✅ configured, placeholder entry point
+├── infra/                      (not yet created — Terraform, ECS/K8s, CI/CD)
+├── db/                          (not yet created — migrations, seed data)
+├── docker-compose.yml           # ✅ local dev: Postgres, Redis, MinIO, Mailpit, core-api
+├── scripts/                     # ✅ dev environment scripts — see scripts/README.md
 └── docs/
     └── architecture-decision-records/   (not yet created)
 ```
 
 ## Prerequisites
 
-- Node.js `>=20.0.0 <21.0.0` (LTS)
+- Node.js `>=22.0.0 <23.0.0` (current Active LTS)
 - pnpm `9.15.0` (pinned via `packageManager` in `package.json`; use [Corepack](https://nodejs.org/api/corepack.html))
+- Docker + Docker Compose (for the local development environment — see below)
 
 ## Getting Started
 
@@ -59,9 +65,44 @@ corepack enable
 pnpm install
 ```
 
-There is nothing to build or run yet — no `apps/` or `services/` exist. This install
-step validates that the workspace tooling itself (ESLint, Prettier, Husky, lint-staged,
-commitlint, Turborepo) is wired correctly.
+This installs and links all workspace packages, apps, and `core-api`. To run
+individual pieces directly on the host (without Docker):
+
+```bash
+pnpm --filter @elewate/web dev       # http://localhost:3000
+pnpm --filter @elewate/admin dev     # (pick a different port if running alongside web)
+pnpm --filter @elewate/portal dev
+pnpm --filter @elewate/core-api dev  # http://localhost:4000/health, /graphiql
+```
+
+`core-api` run this way has nothing to actually connect to — see the next section for
+that.
+
+## Local Development Environment
+
+`docker-compose.yml` at the repo root provisions everything `core-api` will eventually
+need: PostgreSQL, Redis, MinIO (S3-compatible storage), Mailpit (SMTP capture), and
+`core-api` itself, built from `services/core-api/Dockerfile`.
+
+```bash
+pnpm run dev:setup
+```
+
+This creates `.env` from `.env.example` if you don't have one yet, builds and starts
+the full stack, waits for every service to report healthy, and prints where each one
+is reachable (`core-api` REST/GraphQL, Postgres, Redis, MinIO API + console, Mailpit
+UI). See [`scripts/README.md`](./scripts/README.md) for what each script does and
+what's actually been verified about this setup versus what still needs a first real
+boot on a machine with normal internet access.
+
+Other useful commands:
+
+```bash
+pnpm run docker:logs   # follow logs from every service
+pnpm run docker:ps     # see current status
+pnpm run docker:down   # stop everything (keeps data volumes)
+pnpm run dev:reset     # stop everything AND delete data volumes (destructive, confirms first)
+```
 
 ## Tooling
 

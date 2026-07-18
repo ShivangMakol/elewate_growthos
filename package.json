@@ -22,7 +22,15 @@
     "test:integration": "turbo run test:integration",
     "test:e2e": "turbo run test:e2e",
     "clean": "turbo run clean && rimraf node_modules",
-    "prepare": "husky"
+    "prepare": "husky",
+    "dev:setup": "bash scripts/setup.sh",
+    "dev:reset": "bash scripts/reset.sh",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:build": "docker compose build",
+    "docker:logs": "docker compose logs -f",
+    "docker:ps": "docker compose ps",
+    "docker:wait": "bash scripts/wait-for-services.sh"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.6.0",
