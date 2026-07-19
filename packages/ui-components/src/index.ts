@@ -5,22 +5,59 @@
  * Shared across apps/web, apps/admin, apps/portal so "Shared Theme" is a real
  * single source of truth rather than three independent implementations.
  *
- * Scope note: only the primitives needed for the app-shell milestone exist so
- * far (Button, Card, ThemeProvider, ThemeToggle, cn utility, shared theme.css).
- * The full shadcn/ui-style component library and the shared KanbanBoard
- * component are introduced in later milestones per the Task List (M0 base
- * primitives, M3 KanbanBoard).
+ * Design system foundation built so far: ThemeProvider (dark mode), color/
+ * typography/spacing/radius tokens (theme.css), and 8 reusable components
+ * (Button, Input, Card, Modal, Drawer, Table, Toast, Tooltip). Deliberately
+ * scoped to only these — no additional components (Select, Checkbox, etc.)
+ * until a later milestone actually needs them. The shared KanbanBoard
+ * component lands at M3 per the Task List.
  */
 
 export { Button, buttonVariants, type ButtonProps } from "./components/button";
+export { Input, type InputProps } from "./components/input";
 export {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
+  CardAction,
   CardContent,
   CardFooter,
 } from "./components/card";
+export {
+  Modal,
+  ModalTrigger,
+  ModalClose,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalTitle,
+  ModalDescription,
+  type ModalContentProps,
+} from "./components/modal";
+export {
+  Drawer,
+  DrawerTrigger,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerFooter,
+  DrawerTitle,
+  DrawerDescription,
+  type DrawerContentProps,
+} from "./components/drawer";
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableRow,
+  TableHead,
+  TableCell,
+  TableCaption,
+} from "./components/table";
+export { Toaster, toast } from "./components/toast";
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "./components/tooltip";
 export { ThemeProvider } from "./components/theme-provider";
 export { ThemeToggle } from "./components/theme-toggle";
 export { cn } from "./lib/utils";
