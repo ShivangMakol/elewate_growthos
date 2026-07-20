@@ -62,4 +62,26 @@ export { ThemeProvider } from "./components/theme-provider";
 export { ThemeToggle } from "./components/theme-toggle";
 export { cn } from "./lib/utils";
 
+// Global application shell (layout only — see each component's own comments
+// for what's real vs. placeholder).
+export { AppShell, type AppShellProps } from "./components/shell/app-shell";
+export { TopBar, type TopBarProps } from "./components/shell/top-bar";
+export { Sidebar, type SidebarProps } from "./components/shell/sidebar";
+export {
+  WorkspaceSwitcher,
+  type WorkspaceSwitcherProps,
+} from "./components/shell/workspace-switcher";
+export {
+  NotificationButton,
+  type NotificationButtonProps,
+} from "./components/shell/notification-button";
+export { AIButton } from "./components/shell/ai-button";
+export { CommandPalette } from "./components/shell/command-palette";
+export { MobileNavDrawer, type MobileNavDrawerProps } from "./components/shell/mobile-nav-drawer";
+export {
+  MobileBottomTabBar,
+  type MobileBottomTabBarProps,
+} from "./components/shell/mobile-bottom-tab-bar";
+export type { NavItem } from "./components/shell/nav-item";
+
 export const UI_COMPONENTS_PACKAGE_VERSION = "0.0.0";
